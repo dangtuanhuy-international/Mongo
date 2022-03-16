@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,14 +13,14 @@ namespace Mango.Services.OrderAPI.Messaging
 {
     public class RabbitMQPaymentConsumer : BackgroundService
     {
-
         private IConnection _connection;
         private IModel _channel;
         private const string ExchangeName = "DirectPaymentUpdate_Exchange";
         private const string PaymentOrderUpdateQueueName = "PaymentOrderUpdateQueueName";
 
         private readonly OrderRepository _orderRepository;
-        string queueName = "";
+        private string queueName = "";
+
         public RabbitMQPaymentConsumer(OrderRepository orderRepository)
         {
             _orderRepository = orderRepository;
@@ -38,6 +37,7 @@ namespace Mango.Services.OrderAPI.Messaging
             _channel.QueueDeclare(PaymentOrderUpdateQueueName, false, false, false, null);
             _channel.QueueBind(PaymentOrderUpdateQueueName, ExchangeName, "PaymentOrder");
         }
+
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             stoppingToken.ThrowIfCancellationRequested();
